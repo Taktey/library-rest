@@ -45,6 +45,24 @@ public class PersonController {
         return personService.convertFromPersonToPersonDTO(byId);
     }
 
+    @PutMapping("/edit/{id}")
+    public void editPerson(@PathVariable Long id, @RequestBody PersonDTO personDTO) {
+        personService.editPerson(id, personDTO);
+    }
+    @PostMapping("/create")
+    public PersonDTO createPerson(@RequestBody PersonDTO personDTO) {
+        return personService.createPerson(personDTO);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public void deletePerson(@PathVariable Long id) {
+        personService.deletePerson(id);
+    }
+    @GetMapping("/restore/{id}")
+    public void restorePerson(@PathVariable Long id) {
+        personService.restorePerson(id);
+    }
+
 }
 
 

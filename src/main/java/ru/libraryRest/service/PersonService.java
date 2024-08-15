@@ -58,14 +58,9 @@ public class PersonService {
         p.setRole("ROLE_USER");
     }
 
-
     public Person personById(Long id) {
         Optional<Person> byId = personRepository.findById(id);
         return byId.orElseThrow(() -> new PersonNotFoundException("Person is not found"));
-    }
-    public void deleteById(Long id) {
-        Person toDelete = personRepository.findByIdAndIsRemoved(id,false);
-        toDelete.setIsRemoved(true);
     }
 
     public List<Person> getAllPeople() {
@@ -76,10 +71,28 @@ public class PersonService {
         return personRepository.findByIsRemoved(true);
     }
 
-    public void savePerson(PersonDTO personDTO) {
+    public void editPerson(Long id, PersonDTO personDTO) {
+        Person person = convertFromDTOToPerson(personDTO);
+        person.setId(id);
+        personRepository.save(person);
+    }
+
+    public void deletePerson(Long id) {
+        Person person = personById(id);
+        person.setIsRemoved(true);
+        personRepository.save(person);
+    }
+
+    public void restorePerson(Long id) {
+        Person person = personById(id);
+        person.setIsRemoved(false);
+        personRepository.save(person);
+    }
+
+    public PersonDTO createPerson(PersonDTO personDTO) {
         Person person = convertFromDTOToPerson(personDTO);
         person.setIsRemoved(false);
-
         personRepository.save(person);
+        return convertFromPersonToPersonDTO(person);
     }
 }
