@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -20,10 +21,11 @@ public class JWTUtil {
     @Value("${jwt_issuer}")
     public String issuer;
 
-    public String generateToken(String username) {
+    public String generateToken(String username, String role) {
         return JWT.create()
                 .withSubject("Details about user")
                 .withClaim("username", username)
+                .withClaim("role", role)
                 .withIssuedAt(new Date())
                 .withIssuer(issuer)
                 .withExpiresAt(Date.from(ZonedDateTime.now().plusMinutes(60).toInstant()))
@@ -36,8 +38,12 @@ public class JWTUtil {
                 .withIssuer(issuer)
                 .build();
         DecodedJWT verify = verifier.verify(token);
-        System.out.println(verify.getClaim("school"));
-
         return verify.getClaim("username").asString();
+    }
+
+
+    public String getUsername(String tokenFromRequest) {
+        String onlyToken = tokenFromRequest.substring(7);
+        return validateTokenAndReturnUsername(onlyToken);
     }
 }

@@ -77,9 +77,11 @@ public class PersonService {
         personRepository.save(person);
     }
 
-    public void deletePerson(Long id) {
+    public void deletePerson(Long id, String deletedBy) {
         Person person = personById(id);
         person.setIsRemoved(true);
+        person.setRemovedPerson(deletedBy);
+        person.setRemovedAt(LocalDateTime.now());
         personRepository.save(person);
     }
 
@@ -89,10 +91,17 @@ public class PersonService {
         personRepository.save(person);
     }
 
-    public PersonDTO createPerson(PersonDTO personDTO) {
+    public PersonDTO createPerson(PersonDTO personDTO, String creator) {
         Person person = convertFromDTOToPerson(personDTO);
         person.setIsRemoved(false);
+        person.setCreatedPerson(creator);
+        person.setCreatedAt(LocalDateTime.now());
         personRepository.save(person);
         return convertFromPersonToPersonDTO(person);
+    }
+
+    public String getRole(String name) {
+        Person person = personRepository.findByNameAndIsRemoved(name, false).orElseThrow(() -> new PersonNotFoundException("Person is not found"));
+        return person.getRole();
     }
 }

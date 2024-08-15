@@ -38,6 +38,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         (s) ->
                                 s.requestMatchers("/auth/login", "/auth/registration", "/error").permitAll()
+                                        .requestMatchers("/books/delete/{id}", "/books/restore/{id}", "/books/add", "/books//update/{id}",
+                                                "/users/removed", "/users/edit/{id}", "/users/create","/users/delete/{id}", "users/restore/{id}")
+                                        .hasRole("Admin")
                                         .anyRequest().authenticated())
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);

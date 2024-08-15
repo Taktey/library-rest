@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.libraryRest.dto.PersonDTO;
 import ru.libraryRest.models.Person;
 import ru.libraryRest.service.PersonService;
+import ru.libraryRest.util.JWTUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +14,12 @@ import java.util.List;
 @RequestMapping("/users")
 public class PersonController {
     private final PersonService personService;
+    private final JWTUtil jwtUtil;
 
     @Autowired
-    public PersonController(PersonService personService) {
+    public PersonController(PersonService personService, JWTUtil jwtUtil) {
         this.personService = personService;
+        this.jwtUtil = jwtUtil;
     }
 
     @GetMapping("/active")
@@ -49,15 +52,19 @@ public class PersonController {
     public void editPerson(@PathVariable Long id, @RequestBody PersonDTO personDTO) {
         personService.editPerson(id, personDTO);
     }
+
     @PostMapping("/create")
-    public PersonDTO createPerson(@RequestBody PersonDTO personDTO) {
-        return personService.createPerson(personDTO);
+    public PersonDTO createPerson(@RequestHeader(value = "Authorization") String auth, @RequestBody PersonDTO personDTO) {
+        String creator = jwtUtil.getUsername(auth);
+        return personService.createPerson(personDTO, creator);
     }
 
     @DeleteMapping("/delete/{id}")
-    public void deletePerson(@PathVariable Long id) {
-        personService.deletePerson(id);
+    public void deletePerson(@RequestHeader(value = "Authorization") String auth, @PathVariable Long id) {
+        String creator = jwtUtil.getUsername(auth);
+        personService.deletePerson(id, creator);
     }
+
     @GetMapping("/restore/{id}")
     public void restorePerson(@PathVariable Long id) {
         personService.restorePerson(id);

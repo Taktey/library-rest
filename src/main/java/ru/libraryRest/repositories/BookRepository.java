@@ -12,5 +12,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     List<Book> findByIsRemoved(boolean isRemoved);
     List<Book> findByAuthorAndIsRemoved(String author, boolean isRemoved);
     Optional<Book> findByIdAndIsRemoved(Long id, boolean isRemoved);
+    Optional<Book> findByNameAndIsRemoved(String name, boolean isRemoved);
     List<Book> findByOwnerIdAndIsRemoved(Long personId, boolean isRemoved);
 }

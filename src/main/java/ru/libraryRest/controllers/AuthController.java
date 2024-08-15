@@ -52,7 +52,8 @@ public class AuthController {
         } catch (Exception e) {
             return Map.of("error", "incorrect login or password");
         }
-        String token = jwtUtil.generateToken(authDTO.getName());
+        String role = personService.getRole(authDTO.getName());
+        String token = jwtUtil.generateToken(authDTO.getName(), role);
         return Map.of("jwt-token", token);
     }
 
@@ -66,7 +67,7 @@ public class AuthController {
             return Map.of("message", "error body");
         }
         personService.save(person);
-        String token = jwtUtil.generateToken(person.getName());
+        String token = jwtUtil.generateToken(person.getName(), "User");
         return Map.of("jwt-token", token);
     }
 }

@@ -29,8 +29,11 @@ public class BookService {
                 .stream().map(book -> modelMapper.map(book, BookDTO.class)).toList();
     }
 
-    public void addBook(BookDTO bookDTO) {
+    public void addBook(BookDTO bookDTO, String createdBy) {
         Book book = convertFromBookDTOToBook(bookDTO);
+        book.setCreatedPerson(createdBy);
+        book.setIsRemoved(false);
+        book.setCreatedAt(LocalDateTime.now());
         bookRepository.save(book);
     }
 
@@ -41,26 +44,29 @@ public class BookService {
         return book;
     }
 
-    public void deleteBook(Long id) {
+    public void deleteBook(Long id, String deletedBy) {
         Book book = bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
         book.setIsRemoved(true);
-        book.setUpdatedAt(LocalDateTime.now());
+        book.setRemovedAt(LocalDateTime.now());
+        book.setRemovedPerson(deletedBy);
         bookRepository.save(book);
     }
 
-    public void restoreBook(Long id) {
+    public void restoreBook(Long id, String restoredBy) {
         Book book = bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
         book.setIsRemoved(false);
         book.setUpdatedAt(LocalDateTime.now());
+        book.setUpdatedPerson(restoredBy);
         bookRepository.save(book);
     }
 
-    public void updateBook(BookDTO bookDTO) {
+    public void updateBook(BookDTO bookDTO, String updatedBy) {
         Book book = bookRepository.findById(bookDTO.getId()).orElseThrow(() -> new RuntimeException("Book not found"));
         book.setName(bookDTO.getName());
         book.setAuthor(bookDTO.getAuthor());
         book.setAnnotation(bookDTO.getAnnotation());
         book.setUpdatedAt(LocalDateTime.now());
+        book.setUpdatedPerson(updatedBy);
         bookRepository.save(book);
     }
 
@@ -69,10 +75,11 @@ public class BookService {
         return modelMapper.map(book, BookDTO.class);
     }
 
-    public void giveBookToPerson(Long bookId, Long personId) {
+    public void giveBookToPerson(Long bookId, Long personId, String updatedBy) {
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Book not found"));
         book.setOwnerId(personId);
         book.setUpdatedAt(LocalDateTime.now());
+        book.setUpdatedPerson(updatedBy);
         bookRepository.save(book);
     }
 
@@ -81,8 +88,19 @@ public class BookService {
                 .stream().map(book -> modelMapper.map(book, BookDTO.class)).toList();
     }
 
-    public void releaseBook(Long bookId) {
+    public void releaseBook(Long bookId, String updatedBy) {
         Book book = bookRepository.findByIdAndIsRemoved(bookId, false).orElseThrow(() -> new RuntimeException("Book not found"));
         book.setOwnerId(null);
+        book.setUpdatedAt(LocalDateTime.now());
+        book.setUpdatedPerson(updatedBy);
+        bookRepository.save(book);
+    }
+
+    public void giveBookToMe(Long bookId, String askedBy) {
+
+    }
+
+    public String getCover(Long id) {
+        return bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found")).getPic();
     }
 }

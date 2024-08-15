@@ -43,4 +43,6 @@ public class Book {
     private String removedPerson;
     @Column(name = "owner_id")
     private Long ownerId;
+    @Column(name = "pic")
+    private String pic;
 }
